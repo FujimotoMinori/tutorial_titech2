@@ -1,0 +1,9 @@
+[release_metadata]
+release:21.2.68
+nightly name:Unknown
+project name:WorkDir
+nightly release:Unknown
+date:2019-10-08T1614
+compiler:GNU-6.2.0
+cxxpath:/cvmfs/sft.cern.ch/lcg/releases/gcc/6.2.0-b9934/x86_64-slc6/bin/g++
+cmake:3.11.0

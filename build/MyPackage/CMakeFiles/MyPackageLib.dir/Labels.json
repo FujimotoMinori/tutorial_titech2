@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/source/MyPackage/src/MyPackageAlg.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"MyPackage"
+		],
+		"name" : "MyPackageLib"
+	}
+}

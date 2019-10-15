@@ -1,0 +1,2 @@
+# Regular package(s) built in WorkDir - 21.2.68
+MyPackage MyPackage-00-00-01

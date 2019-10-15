@@ -1,0 +1,19 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/source/MyPackage/src/components/MyPackage_entries.cxx"
+		},
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/source/MyPackage/src/components/MyPackage_load.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"MyPackage"
+		],
+		"name" : "MyPackage"
+	}
+}

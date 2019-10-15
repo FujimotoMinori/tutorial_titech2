@@ -1,0 +1,19 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/include/MyPackage"
+		},
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/include/MyPackage.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"MyPackage"
+		],
+		"name" : "MyPackageHeaderInstall"
+	}
+}

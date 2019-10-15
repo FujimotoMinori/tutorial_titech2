@@ -1,0 +1,22 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/jobOptions/MyPackage/MyPackageAlgJobOptions.py"
+		},
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/source/MyPackage/share/MyPackageAlgJobOptions.py"
+		},
+		{
+			"file" : "/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/jobOptions/MyPackage/MyPackageAlgJobOptions.py.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"MyPackage"
+		],
+		"name" : "MyPackageJobOptInstall"
+	}
+}

@@ -1,0 +1,5 @@
+# Target labels
+ MyPackage
+# Source files and their labels
+/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/include/MyPackage
+/home/fujimoto/tutorial_titech2/build/x86_64-centos7-gcc62-opt/include/MyPackage.rule
