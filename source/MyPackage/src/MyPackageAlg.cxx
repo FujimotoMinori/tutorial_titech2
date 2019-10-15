@@ -366,6 +366,10 @@ StatusCode MyPackageAlg::execute() {
 			pass_eta = true;
 		}
 		if(!pass_eta) continue;
+                
+                //select photon by pt
+                bool pass_pt = false;
+                if (photonSC->pt()*0.001 > 25) pass_pt = true;
 
 		//reject bad  photon 
 		bool pass_badcls = photonSC->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON);
@@ -396,7 +400,7 @@ StatusCode MyPackageAlg::execute() {
 		ATH_MSG_INFO("execute(): photon pt/eta/phi = " << (photonSC->pt() * 0.001) << " GeV/" << photonSC->eta() << "/" << photonSC->phi());
 		m_histphoton->Fill(photonSC->pt() * 0.001); //pt(GeV)
 
-                if( pass_eta && pass_badcls && pass_OQ && pass_author ) PASS_PRESELECTION = true;
+                if( pass_pt && pass_eta && pass_badcls && pass_OQ && pass_author ) PASS_PRESELECTION = true;
 
 
 	} // end for loop over photons
