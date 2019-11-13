@@ -71,6 +71,10 @@ class MyPackageAlg: public ::AthAnalysisAlgorithm {
   TH1D* m_histjet = 0;
   TH1D* m_histjetbtagged = 0;
   TH1D* m_histphoton = 0;
+  TH1D* m_histpassedphoton = 0;
+  TH1D* m_histsignalphotonorg = 0;
+  TH1D* m_histsignalphoton = 0;
+  TH1D* m_histphotoncandidate = 0;
   //gammagamma
   TH1D* m_histdiphoton = 0;
   TTree* m_tree = 0;

@@ -84,7 +84,15 @@ StatusCode MyPackageAlg::initialize() {
 	CHECK( histSvc()->regHist("/MYSTREAM/jetbtagged", m_histjetbtagged) );
 	m_histphoton = new TH1D("photon","photon",500,0,500);
 	CHECK( histSvc()->regHist("/MYSTREAM/photon", m_histphoton) );
-        //gammagamma
+	m_histpassedphoton = new TH1D("passedphoton","passedphoton",500,0,500);
+	CHECK( histSvc()->regHist("/MYSTREAM/passedphoton", m_histpassedphoton) );
+	m_histsignalphotonorg = new TH1D("signalphotonorg","signalphotonorg",500,0,500);
+	CHECK( histSvc()->regHist("/MYSTREAM/signalphotonorg", m_histsignalphotonorg) );
+	m_histsignalphoton = new TH1D("signalphoton","signalphoton",500,0,500);
+	CHECK( histSvc()->regHist("/MYSTREAM/signalphoton", m_histsignalphoton) );
+	m_histphotoncandidate = new TH1D("photoncandidate","photoncandidate",500,0,500);
+	CHECK( histSvc()->regHist("/MYSTREAM/photoncandidate", m_histphotoncandidate) );
+	//gammagamma
 	m_histdiphoton = new TH1D("diphoton","diphoton",500,0,500);
 	CHECK( histSvc()->regHist("/MYSTREAM/diphoton", m_histdiphoton) );
 
@@ -169,6 +177,8 @@ StatusCode MyPackageAlg::execute() {
 	// if data check if event passes GRL 
 	bool pass_HLT_mu26_ivarmedium = m_tdt->isPassed("HLT_mu26_ivarmedium");
 	bool pass_HLT_mu50 = m_tdt->isPassed("HLT_mu50");
+	bool pass_HLT_g35loose = m_tdt->isPassed("HLT_g35_loose_g25_loose");
+	bool pass_HLT_g35medium = m_tdt->isPassed("HLT_g35_medium_g25_medium_L12EM20VH");
 
 	const xAOD::EventInfo* ei = 0;
 	CHECK( evtStore()->retrieve( ei , "EventInfo" ) );
@@ -205,6 +215,7 @@ StatusCode MyPackageAlg::execute() {
 
 	//trigger check
 	//if( !pass_HLT_mu26_ivarmedium || !pass_HLT_mu50 ) return StatusCode::SUCCESS;
+	if( !pass_HLT_g35loose || !pass_HLT_g35medium ) return StatusCode::SUCCESS;
 
 	//------------
 	// MUONS
@@ -340,7 +351,7 @@ StatusCode MyPackageAlg::execute() {
 	std::unique_ptr<xAOD::PhotonContainer> photonsSC (photons_shallowCopy.first);
 	std::unique_ptr<xAOD::ShallowAuxContainer> photonsAuxSC (photons_shallowCopy.second);
 
-        bool PASS_PRESELECTION = false;
+	bool PASS_PRESELECTION = false;
 
 	// loop over the photons in the container 
 	for (auto photonSC : *photonsSC) {
@@ -349,6 +360,7 @@ StatusCode MyPackageAlg::execute() {
 			ATH_MSG_INFO ("execute(): Problem with Photon Calibration And Smearing Tool (Error or OutOfValidityRange)");
 		}
 		//ATH_MSG_INFO("execute(): corrected photon pt/eta/phi = " << (photonSC->pt() * 0.001) << " GeV/" << photonSC->eta() << "/" << photonSC->phi());
+
 		if(isMC) { // NOT apply Fudge to AFII samples!!!!!!!!!!!!!!!!!!!!!!!!! 
 			float unfudged_weta1 = photonSC->auxdata<float>("weta1");
 			if(m_fudgeMCTool->applyCorrection(*photonSC) != CP::CorrectionCode::Ok){
@@ -365,11 +377,10 @@ StatusCode MyPackageAlg::execute() {
 					&& fabs( photonSC->caloCluster()->etaBE(2) ) < 2.37) ) {
 			pass_eta = true;
 		}
-		if(!pass_eta) continue;
-                
-                //select photon by pt
-                bool pass_pt = false;
-                if (photonSC->pt()*0.001 > 25) pass_pt = true;
+
+		//select photon by pt
+		bool pass_pt = false;
+		if (photonSC->pt()*0.001 > 25) pass_pt = true;
 
 		//reject bad  photon 
 		bool pass_badcls = photonSC->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON);
@@ -382,7 +393,6 @@ StatusCode MyPackageAlg::execute() {
 					) ) ){
 			pass_OQ = true;
 		}
-		if(!pass_badcls || !pass_OQ) continue;
 
 		//author cut
 		bool pass_author = false;
@@ -390,17 +400,16 @@ StatusCode MyPackageAlg::execute() {
 		if ((author & xAOD::EgammaParameters::AuthorPhoton) || (author & xAOD::EgammaParameters::AuthorAmbiguous)){
 			pass_author = true;
 		}
-		if(!pass_author) continue;
 
 		bool pass_LooseID = m_photonLooseIsEMSelector->accept(photonSC);
 		bool pass_TightID = m_photonTightIsEMSelector->accept(photonSC);
 		bool pass_HV = m_deadHVTool->accept(photonSC);
-		//if(!pass_LooseID || !pass_TightID || !pass_HV) continue;
 
 		ATH_MSG_INFO("execute(): photon pt/eta/phi = " << (photonSC->pt() * 0.001) << " GeV/" << photonSC->eta() << "/" << photonSC->phi());
-		m_histphoton->Fill(photonSC->pt() * 0.001); //pt(GeV)
 
-                if( pass_pt && pass_eta && pass_badcls && pass_OQ && pass_author ) PASS_PRESELECTION = true;
+		if( pass_pt && pass_eta && pass_badcls && pass_OQ && pass_author && pass_TightID /*&& pass_HV*/) PASS_PRESELECTION = true;
+		m_histphoton->Fill(photonSC->pt() * 0.001); //pt(GeV)
+		if(PASS_PRESELECTION) m_histpassedphoton->Fill(photonSC->pt() * 0.001); //pt(GeV)
 
 
 	} // end for loop over photons
@@ -427,6 +436,8 @@ StatusCode MyPackageAlg::execute() {
 	}
 
 	for (auto signalphoton : signalphotons) {
+		m_histsignalphotonorg->Fill(signalphoton->pt() * 0.001); //pt(GeV)
+
 		if (signalphoton->caloCluster() && fabs(signalphoton->caloCluster()->etaBE(1)) < 10.0
 				&& m_pointTool->correctPrimaryVertex(*signalphoton, vertex->z()).isFailure() ) {
 			ATH_MSG_WARNING ("execute(): Pointing tool unable to correct photon for PV");
@@ -445,6 +456,9 @@ StatusCode MyPackageAlg::execute() {
 		m_track_iso_tool->decorateParticle(*signalphoton, m_isoT, m_corrList, vertex, &tracksToExclude);
 		if (not m_isoCorrTool->applyCorrection(*signalphoton))
 			ATH_MSG_FATAL("execute(): Couldn't correct photon isolation leakage?");
+
+		m_histsignalphoton->Fill(signalphoton->pt() * 0.001); //pt(GeV)
+
 	}
 
 
@@ -454,12 +468,15 @@ StatusCode MyPackageAlg::execute() {
 	xAOD::PhotonContainer::const_iterator photon_itr1 = signalphotons.begin();
 	xAOD::PhotonContainer::const_iterator photon_end = signalphotons.end();
 	for ( ; photon_itr1!=photon_end; ++photon_itr1 ) {
+		m_histphotoncandidate->Fill((*photon_itr1)->pt() * 0.001); //pt(GeV)
 		// second photon loop 
 		xAOD::PhotonContainer::const_iterator photon_itr2 = photon_itr1;
 		for ( photon_itr2++; photon_itr2!=photon_end; ++photon_itr2 ) {
 			// then get diphotonmass 
 			const double diphotonmass = ((*photon_itr1)->p4() + (*photon_itr2)->p4()).M();
-			m_histdiphoton->Fill(diphotonmass*0.001); //pt(GeV)
+			if ((*photon_itr1)->pt()/diphotonmass > 0.35 && (*photon_itr2)->pt()/diphotonmass > 0.25){
+				if (diphotonmass*0.001 > 105 && diphotonmass*0.001 < 160) m_histdiphoton->Fill(diphotonmass*0.001); //pt(GeV)
+			}
 		}
 	}
 
