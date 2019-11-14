@@ -66,6 +66,7 @@ class MyPackageAlg: public ::AthAnalysisAlgorithm {
    //TH1D* m_myHist = 0;
    //TTree* m_myTree = 0;
 
+  //histograms
   TH1D* m_histAverageIntPerXing = 0;
   TH1D* m_histdiMuon = 0;
   TH1D* m_histjet = 0;
@@ -75,8 +76,19 @@ class MyPackageAlg: public ::AthAnalysisAlgorithm {
   TH1D* m_histsignalphotonorg = 0;
   TH1D* m_histsignalphoton = 0;
   TH1D* m_histphotoncandidate = 0;
-  //gammagamma
   TH1D* m_histdiphoton = 0;
+  /*for cutflow*/
+  m_histpassedpt = 0; 
+  m_histpassedeta = 0; 
+  m_histpassedbadcls = 0; 
+  m_histpassedOQ = 0; 
+  m_histpassedauthor = 0; 
+  m_histpassedTightID = 0;
+  m_histpassedTightID = 0;
+  m_histpassedphoton = 0; 
+  m_histdiphotonbeforecut = 0;
+
+  //tree
   TTree* m_tree = 0;
 
   uint32_t m_runNumber = 0;
